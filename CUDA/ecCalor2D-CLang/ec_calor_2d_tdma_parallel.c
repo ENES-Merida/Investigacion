@@ -129,6 +129,7 @@ int main(int argc, char const *argv[])
             for (jj = 1; jj < nj-1; jj++)
             {
                 tri(AI, AC, AD, resultx, mi, jj);
+                #pragma acc loop
                 for (ii = 0; ii < mi; ii++)
                 {
                     temper[ii][jj] = resultx[ii][jj];
@@ -152,6 +153,7 @@ int main(int argc, char const *argv[])
             for (ii = 1; ii < mi-1; ii++)
             {
                 tri(BI, BC, BD, resulty, nj, ii);
+                #pragma acc loop
                 for (jj = 0; jj < nj; jj++)
                 {
                     temper[ii][jj] = resulty[jj][ii];
@@ -163,6 +165,7 @@ int main(int argc, char const *argv[])
             #pragma acc parallel loop
             for (ii = 0; ii < mi; ii++)
             {
+                #pragma acc loop
                 for (jj = 0; jj < nj; jj++)
                 {
                     temp_ant[ii][jj] = temper[ii][jj];
