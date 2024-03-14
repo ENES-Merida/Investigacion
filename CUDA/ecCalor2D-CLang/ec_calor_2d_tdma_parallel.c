@@ -122,6 +122,12 @@ int main(int argc, char const *argv[])
                 */
                 ensambla_tdmax(AI,AC,AD,resultx,deltax,deltay,temp_ant,cond_ter,temp_ini,temp_fin,jj);
             }
+            if (kk == 29) {
+                printMatrix(AI, mi,nj);
+                printMatrix(AC, mi,nj);
+                printMatrix(AD, mi,nj);
+                printMatrix(resultx, mi,nj);
+            }
             /*
             * Llamamos al resolvedor
             */
@@ -144,7 +150,7 @@ int main(int argc, char const *argv[])
                 /*
                 * Ensamblamos matrices tridiagonales en direccion y
                 */
-            ensambla_tdmay(BI,BC,BD,resulty,deltax,deltay,temper,cond_ter,flux_aba,flux_arr,ii);
+                ensambla_tdmay(BI,BC,BD,resulty,deltax,deltay,temper,cond_ter,flux_aba,flux_arr,ii);
             }
             /*
             * Llamamos al resolvedor

@@ -3,7 +3,7 @@
 
 #include "herramientas.h"
 
-const int mi = 2048, nj = 1024, nn = 1024;
+const int mi = 5, nj = 6, nn = 1024;
 const double pi = 3.1415926535;
 
 #pragma acc routine vector
@@ -31,10 +31,10 @@ void ensambla_tdmax(
     AI[mi - 1][jj] = 0.0;
     AC[mi - 1][jj] = 1.0;
     resultx[mi - 1][jj] = temp_fin;
-    /*
-     * Ensamblado de la matriz tridiagonal y del vector de resultados
-    */
-    #pragma acc loop vector
+/*
+ * Ensamblado de la matriz tridiagonal y del vector de resultados
+ */
+#pragma acc loop vector
     for (iin = 1; iin < mi - 1; iin++)
     {
         AI[iin][jj] = -1.0 * cond_ter / (deltax * deltax);
@@ -69,10 +69,10 @@ void ensambla_tdmay(
     BI[nj - 1][ii] = 0.0;        // -1.0 / deltay;
     BC[nj - 1][ii] = 1.0;        // 1.0 / deltay;
     resulty[nj - 1][ii] = 308.0; // flux_arr
-    /*
-     * Ensamblado de la matriz tridiagonal y del vector de resultados
-    */
-    #pragma acc loop vector
+/*
+ * Ensamblado de la matriz tridiagonal y del vector de resultados
+ */
+#pragma acc loop vector
     for (jjn = 1; jjn < nj - 1; jjn++)
     {
         BI[jjn][ii] = -1.0 * cond_ter / (deltay * deltay);
@@ -107,4 +107,29 @@ void tri(
     }
 }
 
+long obtener_nnz_matriz()
+{
+    long non_zero_elements = 12 + (mi + nj - 8) * 8 + (mi - 4) * (nj - 4) * 5;
+    return non_zero_elements;
+}
+
+void obtener_formato_comprimida_por_fila(double **AI, double **AC, double **AD, double **BI, double **BD, long nnz)
+{
+    int vector_size = (mi - 2) * (nj - 2) + 1;
+    double *csrPtr;
+    csrPtr = allocate_memory_vector(vector_size);
+    double *csrValue;
+    csrValue = allocate_memory_vector(nnz);
+    double *csrColInd;
+    csrColInd = allocate_memory_vector(nnz);
+
+    int idx = 0;
+    for (int j = 1; j < mi - 2; j++)
+    {
+        for (int i = 0; i < nj - 2; i++)
+        {
+
+        }
+    }
+}
 #endif
