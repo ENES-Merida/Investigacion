@@ -27,6 +27,23 @@ double *allocate_memory_vector(int vector_size)
     return vector;
 }
 
+// Allocate memory to an vector of int data type
+int *allocate_memory_vector_int(int vector_size)
+{
+    int *vector;
+    size_t size_in_bytes;
+    size_in_bytes = vector_size * sizeof(int);
+
+    vector = (int *)malloc(size_in_bytes);
+
+    // Check that the memory allocation was successful.
+    if (!vector)
+    {
+        error_handler("Allocation failure in allocate_memory_vector()");
+    }
+    return vector;
+}
+
 // Allocate memory to an matrix of double data type
 double **allocate_memory_matrix(int rows, int columns)
 {
@@ -100,4 +117,25 @@ void printMatrix(double **matrix, int rows, int columns)
     printf("\n");
 }
 
+// Print to console a Vector
+void printVector(double *vector, int vector_size)
+{
+    for (int i = 0; i < vector_size ; ++i)
+    {
+        printf("%f ", vector[i]);
+        printf("\n");
+    }
+    printf("\n");
+}
+
+// Print to console a Vector
+void print_vector_int(int *vector, int vector_size)
+{
+    for (int i = 0; i < vector_size ; ++i)
+    {
+        printf("%d ", vector[i]);
+        printf("\n");
+    }
+    printf("\n");
+}
 #endif

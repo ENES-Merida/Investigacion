@@ -97,6 +97,7 @@ int main(int argc, char const *argv[])
     inicializar_matriz(resulty, nj, mi, 0.0);
     inicializar_matriz(tempx, mi, nj, 0.0);
     inicializar_matriz(tempy, nj, mi, 0.0);
+
     /*
     * Abrimos la region de datos paralela
     */
@@ -109,7 +110,7 @@ int main(int argc, char const *argv[])
         /*
         * Bucle de pseudotiempo
         */
-        for (kk = 0; kk < 30; kk++)
+        for (kk = 0; kk < 1; kk++)
         {
             /*
             * Inicia el ciclo que recorre la coordenada y resolviendo problemas 1D en la direccion de x
@@ -121,12 +122,6 @@ int main(int argc, char const *argv[])
                 * Ensamblando matrices en direccion x
                 */
                 ensambla_tdmax(AI,AC,AD,resultx,deltax,deltay,temp_ant,cond_ter,temp_ini,temp_fin,jj);
-            }
-            if (kk == 29) {
-                printMatrix(AI, mi,nj);
-                printMatrix(AC, mi,nj);
-                printMatrix(AD, mi,nj);
-                printMatrix(resultx, mi,nj);
             }
             /*
             * Llamamos al resolvedor
@@ -152,6 +147,14 @@ int main(int argc, char const *argv[])
                 */
                 ensambla_tdmay(BI,BC,BD,resulty,deltax,deltay,temper,cond_ter,flux_aba,flux_arr,ii);
             }
+            // prueba
+            long nnz_e = obtener_nnz_matriz();
+            // printf(" nnze = %ld \n", nnz_e);
+            band_matrix(BI, AI, AC, AD, BD, nnz_e);
+            // int pr = obtener_indice_columna(1,1);
+            // printf(" nnze = %ld \n", nnz_e);
+            // printf(" [i,j] = %d \n", pr);
+            //
             /*
             * Llamamos al resolvedor
             */

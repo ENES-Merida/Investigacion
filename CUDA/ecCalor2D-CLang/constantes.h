@@ -3,7 +3,7 @@
 
 #include "herramientas.h"
 
-const int mi = 5, nj = 6, nn = 1024;
+const int mi = 6, nj = 5, nn = 1024;
 const double pi = 3.1415926535;
 
 #pragma acc routine vector
@@ -56,29 +56,29 @@ void ensambla_tdmay(
     const double cond_ter,
     const double flux_aba,
     const double flux_arr,
-    const int ii)
+    const int jj)
 {
     int jjn;
 
     /*
      * Se definen las condiciones de frontera
      */
-    BC[0][ii] = 1.0;             // -1.0 / deltay;
-    BD[0][ii] = 0.0;             // 1.0 / deltay;
-    resulty[0][ii] = 308.0;      // flux_aba;
-    BI[nj - 1][ii] = 0.0;        // -1.0 / deltay;
-    BC[nj - 1][ii] = 1.0;        // 1.0 / deltay;
-    resulty[nj - 1][ii] = 308.0; // flux_arr
+    BC[0][jj] = 1.0;             // -1.0 / deltay;
+    BD[0][jj] = 0.0;             // 1.0 / deltay;
+    resulty[0][jj] = 308.0;      // flux_aba;
+    BI[nj - 1][jj] = 0.0;        // -1.0 / deltay;
+    BC[nj - 1][jj] = 1.0;        // 1.0 / deltay;
+    resulty[nj - 1][jj] = 308.0; // flux_arr
 /*
  * Ensamblado de la matriz tridiagonal y del vector de resultados
  */
 #pragma acc loop vector
     for (jjn = 1; jjn < nj - 1; jjn++)
     {
-        BI[jjn][ii] = -1.0 * cond_ter / (deltay * deltay);
-        BC[jjn][ii] = 2.0 * cond_ter * (1.0 / (deltay * deltay) + 1.0 / (deltax * deltax));
-        BD[jjn][ii] = -1.0 * cond_ter / (deltay * deltay);
-        resulty[jjn][ii] = cond_ter / (deltax * deltax) * temper[ii + 1][jjn] + cond_ter / (deltax * deltax) * temper[ii - 1][jjn];
+        BI[jjn][jj] = -1.0 * cond_ter / (deltay * deltay);
+        BC[jjn][jj] = 2.0 * cond_ter * (1.0 / (deltay * deltay) + 1.0 / (deltax * deltax));
+        BD[jjn][jj] = -1.0 * cond_ter / (deltay * deltay);
+        resulty[jjn][jj] = cond_ter / (deltax * deltax) * temper[jj + 1][jjn] + cond_ter / (deltax * deltax) * temper[jj - 1][jjn];
     }
 }
 
@@ -107,29 +107,96 @@ void tri(
     }
 }
 
-long obtener_nnz_matriz()
+int obtener_nnz_matriz()
 {
-    long non_zero_elements = 12 + (mi + nj - 8) * 8 + (mi - 4) * (nj - 4) * 5;
+    int non_zero_elements = 12 + (mi + nj - 8) * 8 + (mi - 4) * (nj - 4) * 5;
     return non_zero_elements;
 }
 
-void obtener_formato_comprimida_por_fila(double **AI, double **AC, double **AD, double **BI, double **BD, long nnz)
+int obtener_indice_columna(int ii, int jj)
 {
-    int vector_size = (mi - 2) * (nj - 2) + 1;
-    double *csrPtr;
-    csrPtr = allocate_memory_vector(vector_size);
-    double *csrValue;
-    csrValue = allocate_memory_vector(nnz);
-    double *csrColInd;
-    csrColInd = allocate_memory_vector(nnz);
+    int indice_columna;
+    indice_columna = (jj - 1) * (mi - 2) + ii - (mi - 1) - 1;
+    return indice_columna;
+}
 
-    int idx = 0;
-    for (int j = 1; j < mi - 2; j++)
+void band_matrix(double **BI, double **AI, double **AC, double **AD, double **BD, int nnz_e)
+{
+    double *csrVal;
+    int *csrPtr;
+    int *csrColInd;
+
+    int size_ptr = (mi - 2) * (nj - 2) + 1;
+
+    csrVal = allocate_memory_vector(nnz_e);
+    csrColInd = allocate_memory_vector_int(nnz_e);
+    csrPtr = allocate_memory_vector_int(size_ptr);
+
+    int kk = -1;
+    int tt = 0;
+    int counter = -1;
+    csrPtr[tt] = 0;
+
+    for (int jj = 1; jj < nj - 1; jj++)
     {
-        for (int i = 0; i < nj - 2; i++)
+        // printf("paso por aqui k=%d\n", kk);
+        for (int ii = 1; ii < mi - 1; ii++)
         {
-
+            if (jj >= 2 && jj < nj - 1)
+            {
+                kk++;
+                csrVal[kk] = BI[jj - 1][ii];
+                csrColInd[kk] = obtener_indice_columna(ii + 1, jj);
+                counter++;
+            }
+            if (ii >= 2 && ii < mi - 1)
+            {
+                kk++;
+                csrVal[kk] = AI[ii - 1][jj];
+                csrColInd[kk] = obtener_indice_columna(ii, jj + 1);
+                counter++;
+            }
+            kk++;
+            if (kk >= nnz_e)
+                break;
+            // printf("paso por aqui k=%d\n", kk);
+            csrVal[kk] = AC[ii][jj];
+            csrColInd[kk] = obtener_indice_columna(ii + 1, jj + 1);
+            counter++;
+            if (ii >= 1 && ii < mi - 2)
+            {
+                kk++;
+                csrVal[kk] = AD[ii + 1][jj];
+                csrColInd[kk] = obtener_indice_columna(ii + 2, jj + 1);
+                counter++;
+            }
+            if (jj >= 1 && jj < nj - 2)
+            {
+                kk++;
+                csrVal[kk] = BD[jj + 1][ii];
+                csrColInd[kk] = obtener_indice_columna(ii + 1, jj + 2);
+                counter++;
+            }
+            tt++;
+            csrPtr[tt] = counter + 1;
         }
     }
+    // print_vector_int(csrColInd, nnz_e);
+    // print_vector_int(csrPtr, (mi - 2) * (nj - 2) + 1);
+    // printVector(csrVal, nnz_e);
+    for (int ii = 0; ii < nnz_e; ii++)
+    {
+        if (ii < size_ptr)
+        {
+            printf("Val[%d] = %f | ColInd[%d] = %d | Ptr[%d] = %d\n", ii, csrVal[ii], ii, csrColInd[ii], ii, csrPtr[ii]);
+            continue;
+        }
+        printf("Val[%d] = %f | ColInd[%d] = %d\n", ii, csrVal[ii], ii, csrColInd[ii]);
+    }
+
+    free(csrPtr);
+    free(csrColInd);
+    free(csrVal);
 }
+
 #endif
