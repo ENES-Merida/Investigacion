@@ -3,7 +3,7 @@
 
 #include "herramientas.h"
 
-const int mi = 6, nj = 5, nn = 1024;
+const int mi = 7, nj = 9, nn = 1024;
 const double pi = 3.1415926535;
 
 #pragma acc routine vector
@@ -130,16 +130,6 @@ void obtener_formato_csr(double **BI,
     int *csrIndCol,
     int *csrPtr)
 {
-    double *csrVal;
-    int *csrPtr;
-    int *csrIndCol;
-
-    int size_ptr = (mi - 2) * (nj - 2) + 1;
-
-    csrVal = allocate_memory_vector(elementos_no_cero);
-    csrIndCol = allocate_memory_vector_int(elementos_no_cero);
-    csrPtr = allocate_memory_vector_int(size_ptr);
-
     int kk = -1;
     int tt = 0;
     int counter = -1;
@@ -189,22 +179,5 @@ void obtener_formato_csr(double **BI,
             csrPtr[tt] = counter + 1;
         }
     }
-    // print_vector_int(csrIndCol, elementos_no_cero);
-    // print_vector_int(csrPtr, (mi - 2) * (nj - 2) + 1);
-    // printVector(csrVal, elementos_no_cero);
-    for (int ii = 0; ii < elementos_no_cero; ii++)
-    {
-        if (ii < size_ptr)
-        {
-            printf("Val[%d] = %f | ColInd[%d] = %d | Ptr[%d] = %d\n", ii, csrVal[ii], ii, csrIndCol[ii], ii, csrPtr[ii]);
-            continue;
-        }
-        printf("Val[%d] = %f | ColInd[%d] = %d\n", ii, csrVal[ii], ii, csrIndCol[ii]);
-    }
-
-    free(csrPtr);
-    free(csrIndCol);
-    free(csrVal);
 }
-
 #endif

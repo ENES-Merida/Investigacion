@@ -70,7 +70,8 @@ double **allocate_memory_matrix(int rows, int columns)
         if (!matrix[i])
         {
             // Liberar la memoria ya asignada para las filas antes de salir
-            for (int j = 0; j < i; j++) {
+            for (int j = 0; j < i; j++)
+            {
                 free(matrix[j]);
             }
             free(matrix);
@@ -84,7 +85,8 @@ double **allocate_memory_matrix(int rows, int columns)
 void free_matrix(double **matrix, int rows, int columns)
 {
     // Liberar la memoria al final del programa
-    for (int i = 0; i < rows; i++) {
+    for (int i = 0; i < rows; i++)
+    {
         free(matrix[i]);
     }
     free(matrix);
@@ -103,14 +105,13 @@ void inicializar_matriz(double **matriz, const int filas, const int columnas, co
 }
 
 // Print to console a Matrix
-void printMatrix(double **matrix, int rows, int columns)
+void print_matrix(double **matrix, int rows, int columns)
 {
     for (int i = 0; i < rows; i++)
     {
-        for (int j = 0; j < columns; j++) 
+        for (int j = 0; j < columns; j++)
         {
             printf("%f ", matrix[i][j]);
-
         }
         printf("\n");
     }
@@ -118,9 +119,9 @@ void printMatrix(double **matrix, int rows, int columns)
 }
 
 // Print to console a Vector
-void printVector(double *vector, int vector_size)
+void print_vector(double *vector, int vector_size)
 {
-    for (int i = 0; i < vector_size ; ++i)
+    for (int i = 0; i < vector_size; ++i)
     {
         printf("%f ", vector[i]);
         printf("\n");
@@ -131,11 +132,24 @@ void printVector(double *vector, int vector_size)
 // Print to console a Vector
 void print_vector_int(int *vector, int vector_size)
 {
-    for (int i = 0; i < vector_size ; ++i)
+    for (int i = 0; i < vector_size; ++i)
     {
         printf("%d ", vector[i]);
         printf("\n");
     }
     printf("\n");
+}
+
+void print_formato_csr(double *csrVal, int *csrIndCol, int *csrPtr, int elementos_no_cero, int tamanio_ptr)
+{
+    for (int ii = 0; ii < elementos_no_cero; ii++)
+    {
+        if (ii < tamanio_ptr)
+        {
+            printf("Val[%d] = %f | ColInd[%d] = %d | Ptr[%d] = %d\n", ii, csrVal[ii], ii, csrIndCol[ii], ii, csrPtr[ii]);
+            continue;
+        }
+        printf("Val[%d] = %f | ColInd[%d] = %d\n", ii, csrVal[ii], ii, csrIndCol[ii]);
+    }
 }
 #endif
