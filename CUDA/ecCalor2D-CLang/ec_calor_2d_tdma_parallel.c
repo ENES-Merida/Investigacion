@@ -110,7 +110,7 @@ int main(int argc, char const *argv[])
         /*
         * Bucle de pseudotiempo
         */
-        for (kk = 0; kk < 1; kk++)
+        for (kk = 0; kk < 30; kk++)
         {
             /*
             * Inicia el ciclo que recorre la coordenada y resolviendo problemas 1D en la direccion de x
@@ -147,14 +147,6 @@ int main(int argc, char const *argv[])
                 */
                 ensambla_tdmay(BI,BC,BD,resulty,deltax,deltay,temper,cond_ter,flux_aba,flux_arr,ii);
             }
-            // prueba
-            long nnz_e = obtener_nnz_matriz();
-            // printf(" nnze = %ld \n", nnz_e);
-            band_matrix(BI, AI, AC, AD, BD, nnz_e);
-            // int pr = obtener_indice_columna(1,1);
-            // printf(" nnze = %ld \n", nnz_e);
-            // printf(" [i,j] = %d \n", pr);
-            //
             /*
             * Llamamos al resolvedor
             */

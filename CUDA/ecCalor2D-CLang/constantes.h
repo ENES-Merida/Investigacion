@@ -107,10 +107,10 @@ void tri(
     }
 }
 
-int obtener_nnz_matriz()
+int obtener_total_elementos_no_cero()
 {
-    int non_zero_elements = 12 + (mi + nj - 8) * 8 + (mi - 4) * (nj - 4) * 5;
-    return non_zero_elements;
+    int elementos_no_cero = 12 + (mi + nj - 8) * 8 + (mi - 4) * (nj - 4) * 5;
+    return elementos_no_cero;
 }
 
 int obtener_indice_columna(int ii, int jj)
@@ -120,16 +120,24 @@ int obtener_indice_columna(int ii, int jj)
     return indice_columna;
 }
 
-void band_matrix(double **BI, double **AI, double **AC, double **AD, double **BD, int nnz_e)
+void obtener_formato_csr(double **BI,
+    double **AI,
+    double **AC,
+    double **AD,
+    double **BD,
+    int elementos_no_cero,
+    double *csrVal,
+    int *csrIndCol,
+    int *csrPtr)
 {
     double *csrVal;
     int *csrPtr;
-    int *csrColInd;
+    int *csrIndCol;
 
     int size_ptr = (mi - 2) * (nj - 2) + 1;
 
-    csrVal = allocate_memory_vector(nnz_e);
-    csrColInd = allocate_memory_vector_int(nnz_e);
+    csrVal = allocate_memory_vector(elementos_no_cero);
+    csrIndCol = allocate_memory_vector_int(elementos_no_cero);
     csrPtr = allocate_memory_vector_int(size_ptr);
 
     int kk = -1;
@@ -146,56 +154,56 @@ void band_matrix(double **BI, double **AI, double **AC, double **AD, double **BD
             {
                 kk++;
                 csrVal[kk] = BI[jj - 1][ii];
-                csrColInd[kk] = obtener_indice_columna(ii + 1, jj);
+                csrIndCol[kk] = obtener_indice_columna(ii + 1, jj);
                 counter++;
             }
             if (ii >= 2 && ii < mi - 1)
             {
                 kk++;
                 csrVal[kk] = AI[ii - 1][jj];
-                csrColInd[kk] = obtener_indice_columna(ii, jj + 1);
+                csrIndCol[kk] = obtener_indice_columna(ii, jj + 1);
                 counter++;
             }
             kk++;
-            if (kk >= nnz_e)
+            if (kk >= elementos_no_cero)
                 break;
             // printf("paso por aqui k=%d\n", kk);
             csrVal[kk] = AC[ii][jj];
-            csrColInd[kk] = obtener_indice_columna(ii + 1, jj + 1);
+            csrIndCol[kk] = obtener_indice_columna(ii + 1, jj + 1);
             counter++;
             if (ii >= 1 && ii < mi - 2)
             {
                 kk++;
                 csrVal[kk] = AD[ii + 1][jj];
-                csrColInd[kk] = obtener_indice_columna(ii + 2, jj + 1);
+                csrIndCol[kk] = obtener_indice_columna(ii + 2, jj + 1);
                 counter++;
             }
             if (jj >= 1 && jj < nj - 2)
             {
                 kk++;
                 csrVal[kk] = BD[jj + 1][ii];
-                csrColInd[kk] = obtener_indice_columna(ii + 1, jj + 2);
+                csrIndCol[kk] = obtener_indice_columna(ii + 1, jj + 2);
                 counter++;
             }
             tt++;
             csrPtr[tt] = counter + 1;
         }
     }
-    // print_vector_int(csrColInd, nnz_e);
+    // print_vector_int(csrIndCol, elementos_no_cero);
     // print_vector_int(csrPtr, (mi - 2) * (nj - 2) + 1);
-    // printVector(csrVal, nnz_e);
-    for (int ii = 0; ii < nnz_e; ii++)
+    // printVector(csrVal, elementos_no_cero);
+    for (int ii = 0; ii < elementos_no_cero; ii++)
     {
         if (ii < size_ptr)
         {
-            printf("Val[%d] = %f | ColInd[%d] = %d | Ptr[%d] = %d\n", ii, csrVal[ii], ii, csrColInd[ii], ii, csrPtr[ii]);
+            printf("Val[%d] = %f | ColInd[%d] = %d | Ptr[%d] = %d\n", ii, csrVal[ii], ii, csrIndCol[ii], ii, csrPtr[ii]);
             continue;
         }
-        printf("Val[%d] = %f | ColInd[%d] = %d\n", ii, csrVal[ii], ii, csrColInd[ii]);
+        printf("Val[%d] = %f | ColInd[%d] = %d\n", ii, csrVal[ii], ii, csrIndCol[ii]);
     }
 
     free(csrPtr);
-    free(csrColInd);
+    free(csrIndCol);
     free(csrVal);
 }
 
