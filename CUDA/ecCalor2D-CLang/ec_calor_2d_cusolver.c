@@ -98,8 +98,6 @@ int main(int argc, char const *argv[])
     inicializar_matriz(tempx, mi, nj, 0.0);
     inicializar_matriz(tempy, nj, mi, 0.0);
 
-    // print_matrix(temper, mi,nj);
-
     /*
     * Abrimos la region de datos paralela
     */
@@ -129,16 +127,17 @@ int main(int argc, char const *argv[])
             /*
             * Llamamos al resolvedor
             */
-            #pragma acc parallel loop
-            for (jj = 1; jj < nj-1; jj++)
-            {
-                tri(AI, AC, AD, resultx, mi, jj);
-                #pragma acc loop
-                for (ii = 0; ii < mi; ii++)
-                {
-                    temper[ii][jj] = resultx[ii][jj];
-                }
-            }
+            // #pragma acc parallel loop
+            // for (jj = 1; jj < nj-1; jj++)
+            // {
+            //     tri(AI, AC, AD, resultx, mi, jj);
+            //     #pragma acc loop
+            //     for (ii = 0; ii < mi; ii++)
+            //     {
+            //         temper[ii][jj] = resultx[ii][jj];
+            //     }
+            // }
+
             /*
             * Inicia el ciclo que recorre la coordenada x resolviendo problemas 1D en la direccion de y
             */
@@ -153,28 +152,29 @@ int main(int argc, char const *argv[])
             /*
             * Llamamos al resolvedor
             */
-            #pragma acc parallel loop
-            for (ii = 1; ii < mi-1; ii++)
-            {
-                tri(BI, BC, BD, resulty, nj, ii);
-                #pragma acc loop
-                for (jj = 0; jj < nj; jj++)
-                {
-                    temper[ii][jj] = resulty[jj][ii];
-                }
-            }
+            // #pragma acc parallel loop
+            // for (ii = 1; ii < mi-1; ii++)
+            // {
+            //     tri(BI, BC, BD, resulty, nj, ii);
+            //     #pragma acc loop
+            //     for (jj = 0; jj < nj; jj++)
+            //     {
+            //         temper[ii][jj] = resulty[jj][ii];
+            //     }
+            // }
+
             /*
             * Se actualiza la temperatura de la iteracion anterior
             */
-            #pragma acc parallel loop
-            for (ii = 0; ii < mi; ii++)
-            {
-                #pragma acc loop
-                for (jj = 0; jj < nj; jj++)
-                {
-                    temp_ant[ii][jj] = temper[ii][jj];
-                }
-            }
+            // #pragma acc parallel loop
+            // for (ii = 0; ii < mi; ii++)
+            // {
+            //     #pragma acc loop
+            //     for (jj = 0; jj < nj; jj++)
+            //     {
+            //         temp_ant[ii][jj] = temper[ii][jj];
+            //     }
+            // }
             
         }
     /*
@@ -184,34 +184,34 @@ int main(int argc, char const *argv[])
     /*
     * Pruebas
     */
-    // print_matrix(BI, nj, mi);
-    // print_matrix(AI, mi, nj);
+    print_matrix(BI, nj, mi);
+    print_matrix(AI, mi, nj);
     print_matrix(AC, mi, nj);
-    // print_matrix(AD, mi, nj);
-    // print_matrix(BD, nj, mi);
-    print_matrix(BC, nj, mi);
+    print_matrix(AD, mi, nj);
+    print_matrix(BD, nj, mi);
+    // print_matrix(BC, nj, mi);
 
     // print_matrix(temper, mi,nj);
 
-    // double *csrVal;
-    // int *csrIndCol;
-    // int *csrPtr;
+    double *csrVal;
+    int *csrIndCol;
+    int *csrPtr;
     double *resultados;
 
     int tamanio_ptr = (mi - 2) * (nj - 2) + 1;
-    // int elementos_no_cero = obtener_total_elementos_no_cero();
+    int elementos_no_cero = obtener_total_elementos_no_cero();
 
-    // csrVal = allocate_memory_vector(elementos_no_cero);
-    // csrIndCol = allocate_memory_vector_int(elementos_no_cero);
-    // csrPtr = allocate_memory_vector_int(tamanio_ptr);
+    csrVal = allocate_memory_vector(elementos_no_cero);
+    csrIndCol = allocate_memory_vector_int(elementos_no_cero);
+    csrPtr = allocate_memory_vector_int(tamanio_ptr);
     resultados = allocate_memory_vector(tamanio_ptr - 1);
     inicializar_vector(resultados, tamanio_ptr-1, 0.0);
 
-    // obtener_formato_csr(BI, AI, AC, AD, BD, elementos_no_cero, csrVal, csrIndCol, csrPtr);
+    obtener_formato_csr(BI, AI, AC, AD, BD, elementos_no_cero, csrVal, csrIndCol, csrPtr);
     obtener_vector_terminos_independientes(BI, AI, AD, BD, resultados);
 
     // print_formato_csr(csrVal, csrIndCol, csrPtr, elementos_no_cero, tamanio_ptr);
-    print_vector(resultados, tamanio_ptr-1);
+    // print_vector(resultados, tamanio_ptr-1);
 
     /*
     * Escritura de resultados
