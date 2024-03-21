@@ -98,6 +98,8 @@ int main(int argc, char const *argv[])
     inicializar_matriz(tempx, mi, nj, 0.0);
     inicializar_matriz(tempy, nj, mi, 0.0);
 
+    // print_matrix(temper, mi,nj);
+
     /*
     * Abrimos la region de datos paralela
     */
@@ -110,7 +112,7 @@ int main(int argc, char const *argv[])
         /*
         * Bucle de pseudotiempo
         */
-        for (kk = 0; kk < 30; kk++)
+        for (kk = 0; kk < 3; kk++)
         {
             /*
             * Inicia el ciclo que recorre la coordenada y resolviendo problemas 1D en la direccion de x
@@ -123,6 +125,7 @@ int main(int argc, char const *argv[])
                 */
                 ensambla_tdmax(AI,AC,AD,resultx,deltax,deltay,temp_ant,cond_ter,temp_ini,temp_fin,jj);
             }
+
             /*
             * Llamamos al resolvedor
             */
@@ -181,20 +184,35 @@ int main(int argc, char const *argv[])
     /*
     * Pruebas
     */
-    double *csrVal;
-    int *csrIndCol;
-    int *csrPtr;
+    // print_matrix(BI, nj, mi);
+    // print_matrix(AI, mi, nj);
+    print_matrix(AC, mi, nj);
+    // print_matrix(AD, mi, nj);
+    // print_matrix(BD, nj, mi);
+    print_matrix(BC, nj, mi);
+
+    // print_matrix(temper, mi,nj);
+
+    // double *csrVal;
+    // int *csrIndCol;
+    // int *csrPtr;
+    double *resultados;
 
     int tamanio_ptr = (mi - 2) * (nj - 2) + 1;
-    int elementos_no_cero = obtener_total_elementos_no_cero();
+    // int elementos_no_cero = obtener_total_elementos_no_cero();
 
-    csrVal = allocate_memory_vector(elementos_no_cero);
-    csrIndCol = allocate_memory_vector_int(elementos_no_cero);
-    csrPtr = allocate_memory_vector_int(tamanio_ptr);
+    // csrVal = allocate_memory_vector(elementos_no_cero);
+    // csrIndCol = allocate_memory_vector_int(elementos_no_cero);
+    // csrPtr = allocate_memory_vector_int(tamanio_ptr);
+    resultados = allocate_memory_vector(tamanio_ptr - 1);
+    inicializar_vector(resultados, tamanio_ptr-1, 0.0);
 
-    obtener_formato_csr(BI, AI, AC, AD, BD, elementos_no_cero, csrVal, csrIndCol, csrPtr);
+    // obtener_formato_csr(BI, AI, AC, AD, BD, elementos_no_cero, csrVal, csrIndCol, csrPtr);
+    obtener_vector_terminos_independientes(BI, AI, AD, BD, resultados);
 
-    print_formato_csr(csrVal, csrIndCol, csrPtr, elementos_no_cero, tamanio_ptr);
+    // print_formato_csr(csrVal, csrIndCol, csrPtr, elementos_no_cero, tamanio_ptr);
+    print_vector(resultados, tamanio_ptr-1);
+
     /*
     * Escritura de resultados
     */
@@ -217,9 +235,9 @@ int main(int argc, char const *argv[])
     // }
 
     // Liberar memoria de los punteros
-    free(csrPtr);
-    free(csrIndCol);
-    free(csrVal);
+    // free(csrPtr);
+    // free(csrIndCol);
+    // free(csrVal);
 
     free_matrix(BC,nj,mi);
     free_matrix(BD,nj,mi);

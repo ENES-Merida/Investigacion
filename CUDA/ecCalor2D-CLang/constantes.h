@@ -3,7 +3,7 @@
 
 #include "herramientas.h"
 
-const int mi = 7, nj = 9, nn = 1024;
+const int mi = 6, nj = 5, nn = 1024;
 const double pi = 3.1415926535;
 
 #pragma acc routine vector
@@ -23,18 +23,19 @@ void ensambla_tdmax(
     int iin;
 
     /*
-     * Se definen las condiciones de frontera
-     */
+    * Se definen las condiciones de frontera
+    */
+    AI[0][jj] = 1.0;
     AC[0][jj] = 1.0;
     AD[0][jj] = 0.0;
     resultx[0][jj] = temp_ini;
     AI[mi - 1][jj] = 0.0;
     AC[mi - 1][jj] = 1.0;
     resultx[mi - 1][jj] = temp_fin;
-/*
- * Ensamblado de la matriz tridiagonal y del vector de resultados
- */
-#pragma acc loop vector
+    /*
+    * Ensamblado de la matriz tridiagonal y del vector de resultados
+    */
+    #pragma acc loop vector
     for (iin = 1; iin < mi - 1; iin++)
     {
         AI[iin][jj] = -1.0 * cond_ter / (deltax * deltax);
@@ -63,16 +64,17 @@ void ensambla_tdmay(
     /*
      * Se definen las condiciones de frontera
      */
+    BI[0][jj] = 1.0;
     BC[0][jj] = 1.0;             // -1.0 / deltay;
     BD[0][jj] = 0.0;             // 1.0 / deltay;
     resulty[0][jj] = 308.0;      // flux_aba;
     BI[nj - 1][jj] = 0.0;        // -1.0 / deltay;
-    BC[nj - 1][jj] = 1.0;        // 1.0 / deltay;
+    BD[nj - 1][jj] = 3.0;        // 1.0 / deltay;
     resulty[nj - 1][jj] = 308.0; // flux_arr
-/*
- * Ensamblado de la matriz tridiagonal y del vector de resultados
- */
-#pragma acc loop vector
+    /*
+    * Ensamblado de la matriz tridiagonal y del vector de resultados
+    */
+    #pragma acc loop vector
     for (jjn = 1; jjn < nj - 1; jjn++)
     {
         BI[jjn][jj] = -1.0 * cond_ter / (deltay * deltay);
@@ -137,7 +139,6 @@ void obtener_formato_csr(double **BI,
 
     for (int jj = 1; jj < nj - 1; jj++)
     {
-        // printf("paso por aqui k=%d\n", kk);
         for (int ii = 1; ii < mi - 1; ii++)
         {
             if (jj >= 2 && jj < nj - 1)
@@ -147,6 +148,7 @@ void obtener_formato_csr(double **BI,
                 csrIndCol[kk] = obtener_indice_columna(ii + 1, jj);
                 counter++;
             }
+
             if (ii >= 2 && ii < mi - 1)
             {
                 kk++;
@@ -154,13 +156,16 @@ void obtener_formato_csr(double **BI,
                 csrIndCol[kk] = obtener_indice_columna(ii, jj + 1);
                 counter++;
             }
+
             kk++;
+
             if (kk >= elementos_no_cero)
                 break;
-            // printf("paso por aqui k=%d\n", kk);
+            
             csrVal[kk] = AC[ii][jj];
             csrIndCol[kk] = obtener_indice_columna(ii + 1, jj + 1);
             counter++;
+
             if (ii >= 1 && ii < mi - 2)
             {
                 kk++;
@@ -168,6 +173,7 @@ void obtener_formato_csr(double **BI,
                 csrIndCol[kk] = obtener_indice_columna(ii + 2, jj + 1);
                 counter++;
             }
+
             if (jj >= 1 && jj < nj - 2)
             {
                 kk++;
@@ -175,9 +181,52 @@ void obtener_formato_csr(double **BI,
                 csrIndCol[kk] = obtener_indice_columna(ii + 1, jj + 2);
                 counter++;
             }
+
             tt++;
             csrPtr[tt] = counter + 1;
         }
+
     }
+    
+}
+
+// b: vector de terminos independientes b
+void obtener_vector_terminos_independientes(
+    double **AI,
+    double **AD,
+    double **BI,
+    double **BD,
+    double *b)
+{
+    int kk = 0;
+    for (int jj = 1; jj < nj-1; jj++)
+    {
+        for (int ii = 1; ii < mi-1; ii++)
+        {
+            if (jj == 1)
+            {
+                b[kk] += BI[jj-1][ii];
+            }
+
+            if (ii == 1)
+            {
+                b[kk] += AI[ii-1][jj];
+            }
+
+            if (ii == mi-2)
+            {
+                b[kk] += AD[ii+1][jj];
+            }
+
+            if (jj == nj-2)
+            {
+                b[kk] += BD[jj+1][ii];
+            }
+            
+            kk++;
+        }
+        
+    }
+    
 }
 #endif

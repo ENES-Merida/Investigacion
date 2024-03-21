@@ -104,6 +104,14 @@ void inicializar_matriz(double **matriz, const int filas, const int columnas, co
     }
 }
 
+void inicializar_vector(double *vector, const int tamanio_vector, const double valor_inicial)
+{
+    for (int i = 0; i < tamanio_vector; i++)
+    {
+        vector[i] = valor_inicial;
+    }
+}
+
 // Print to console a Matrix
 void print_matrix(double **matrix, int rows, int columns)
 {
