@@ -1,4 +1,6 @@
 # No rastrear los cambios de los siguientes archivos:
+*.f90~
+*.pvsm
 *.vtk
 *.txt
 *.png
@@ -16,5 +18,7 @@ test
 # No rastrear los siguiente directorios:
 build/
 profiler/
-# Los siguientes archivos si se pueden rastrear por git:
+# Los siguientes archivos y directorios si se pueden rastrear por git:
 !CMakeLists.txt
+!test/
+!test/**
