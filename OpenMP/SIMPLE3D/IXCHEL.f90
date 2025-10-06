@@ -273,8 +273,8 @@ DO l=1,itermax/paq_itera      !inicio del repetidor principal
    !$omp    target data map(to:                &
    !$omp    deltaxu,deltayu,deltazu,           &
    !$omp    deltaxv,deltayv,deltazv,           &
-   !$omp    deltaxp,deltayp,deltazp,           &
    !$omp    deltaxw,deltayw,deltazw,           &
+   !$omp    deltaxp,deltayp,deltazp,           &
    !$omp    fu,fv,fw,                          &
    !$omp    fcorr_pres,ftemp,                  &
    !$omp    fexp,feyp,fezp,fexu,feyv,fezw,     &
@@ -282,11 +282,13 @@ DO l=1,itermax/paq_itera      !inicio del repetidor principal
    !$omp    fuente_con_u,fuente_lin_u,         &
    !$omp    fuente_con_v,fuente_lin_v,         &
    !$omp    fuente_con_w,fuente_lin_w,         &
-   !$omp    Ri,dt,rel_vel,rel_pres,            &
+   !$omp    fuente_con_temp,fuente_lin_temp,   &
+   !$omp    Ri,dt,rel_vel,rel_pres,rel_ener,   &
    !$omp    au,av,aw)                          &
    !$omp    map(alloc:a1,b1,c1,r1)             &
    !$omp    map(tofrom: u,v,w,pres,temp,       &
-   !$omp    corr_pres,u_ant,v_ant,w_ant,b_o    &
+   !$omp    corr_pres,                         &
+   !$omp    temp_ant,u_ant,v_ant,w_ant,b_o     &
    !$omp    )
    DO kl=1,paq_itera          !inicio del paquete iteraciones
       !
@@ -962,7 +964,7 @@ DO l=1,itermax/paq_itera      !inicio del repetidor principal
             !
             erro1 = 0.0_DBL
             !
-            !$omp target teams distribute parallel do  reduction(+:erro1)
+            !$omp target teams distribute parallel do reduction(+:erro1)
             calcula_fv: do kk = 2, lk
                do jj = 2, nj-1
                   do ii = 2, mi
