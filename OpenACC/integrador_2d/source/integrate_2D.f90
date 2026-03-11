@@ -14,7 +14,7 @@ subroutine integrate_2D(xpo, ypo, fpo, ii, valor_integral)
     use mod_constantes
     implicit none
     ! -------------------------------------------------------------------------------
-    ! Declaracion de Variables ---------------------------------------------------------------------
+    ! Declaracion de Variables ------------------------------------------------------
     ! -------------------------------------------------------------------------------
     integer, intent(in) :: ii
     real(kind=DBL), dimension(3), intent(in) :: xpo, ypo
@@ -80,7 +80,7 @@ subroutine integrate_2D(xpo, ypo, fpo, ii, valor_integral)
     ! Coeficiente e
     e = df0
     ! -------------------------------------------------------------------------------
-    ! Calcular el valor de la integral -------------------------------------------------------------
+    ! Calcular el valor de la integral ----------------------------------------------
     ! -------------------------------------------------------------------------------
     term_1 = (a/3) * (x3 * x3 * x3 - x1 * x1 * x1) * (y3 - y1)
     term_2 = (b/3) * (x3 - x1) * (y3 * y3 *y3 - y1 * y1 * y1)
