@@ -1999,7 +1999,7 @@ DO l=1,itermax/paq_itera      !inicio del repetidor principal
                   end do
                end do
             end do calcula_ftemp
-            !$omp end parallel
+            !$omp end parallel do
             !$omp end target
             !
             error = dsqrt(error)
