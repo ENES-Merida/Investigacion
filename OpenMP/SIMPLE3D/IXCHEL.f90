@@ -1305,7 +1305,8 @@ DO l=1,itermax/paq_itera      !inicio del repetidor principal
             !
             error = 0.0_DBL
             !
-            !$omp target teams distribute parallel do reduction(+:error)
+            !$omp target map(tofrom:error)
+            !$omp parallel do reduction(+:error)
             calcula_fw: do kk = 2, lk-1
                do jj = 2, nj
                   do ii = 2, mi
@@ -1314,7 +1315,8 @@ DO l=1,itermax/paq_itera      !inicio del repetidor principal
                   end do
                end do
             end do calcula_fw
-            !$omp end target teams distribute parallel do
+            !$omp end parallel do
+            !$omp end target
             !
             error = dsqrt(error) + erro1
             !****************************************
@@ -1606,7 +1608,8 @@ DO l=1,itermax/paq_itera      !inicio del repetidor principal
             !
             error=0._DBL
             !
-            !$omp target teams distribute parallel do reduction(+:error) 
+            !$omp target map(tofrom:error)
+            !$omp parallel do reduction(+:error) 
             calcula_fcorr_press: do kk=2, lk
                do jj=2, nj
                   do ii = 2, mi
@@ -1615,7 +1618,8 @@ DO l=1,itermax/paq_itera      !inicio del repetidor principal
                   end do
                end do
             end do calcula_fcorr_press
-            !$omp end target teams distribute parallel do
+            !$omp end parallel do
+            !$omp end target
             !
             error =dsqrt(error)
             !
@@ -1985,7 +1989,8 @@ DO l=1,itermax/paq_itera      !inicio del repetidor principal
             !
             error = 0.0_DBL
             !
-            !$omp target teams distribute parallel do reduction(+:error)
+            !$omp target map(tofrom:error)
+            !$omp parallel do reduction(+:error)
             calcula_ftemp: do kk = 1, lk+1
                do jj = 1, nj+1
                   do ii = 1, mi+1
@@ -1994,7 +1999,8 @@ DO l=1,itermax/paq_itera      !inicio del repetidor principal
                   end do
                end do
             end do calcula_ftemp
-            !$omp end target teams distribute parallel do
+            !$omp end parallel
+            !$omp end target
             !
             error = dsqrt(error)
             !
@@ -2075,7 +2081,8 @@ DO l=1,itermax/paq_itera      !inicio del repetidor principal
          !
          residuo = 0.0_DBL
          !
-         !$omp target teams distribute parallel do reduction(+:residuo)
+         !$omp target map(tofrom:residuo)
+         !$omp parallel do reduction(+:residuo)
          calculo_residuou: do kk = 2, lk
             do jj = 2, nj
                do ii = 2, mi-1
@@ -2083,7 +2090,8 @@ DO l=1,itermax/paq_itera      !inicio del repetidor principal
                end do
             end do
          end do calculo_residuou
-         !$omp end target teams distribute parallel do
+         !$omp end parallel do
+         !$omp end target
          !
          residuo =dsqrt(residuo)
          !
