@@ -285,7 +285,7 @@ DO l=1,itermax/paq_itera      !inicio del repetidor principal
    !$omp    fuente_con_temp,fuente_lin_temp,   &
    !$omp    Ri,dt,rel_vel,rel_pres,rel_ener,   &
    !$omp    au,av,aw)                          &
-   !$omp    map(alloc:a1,b1,c1,r1)             &
+   !$omp    map(alloc:a1,b1,c1,r1,error)       &
    !$omp    map(tofrom: u,v,w,pres,temp,       &
    !$omp    corr_pres,                         &
    !$omp    temp_ant,u_ant,v_ant,w_ant,b_o     &
@@ -628,7 +628,8 @@ DO l=1,itermax/paq_itera      !inicio del repetidor principal
             !
             error = 0.0_DBL
             !
-            !$omp target teams distribute parallel do reduction(+:error)
+            !$omp target map(tofrom:error)
+            !$omp parallel do reduction(+:error)
             calcula_fu: do kk = 2, lk
                do jj = 2, nj
                   do ii = 2, mi-1
@@ -637,9 +638,11 @@ DO l=1,itermax/paq_itera      !inicio del repetidor principal
                   end do
                end do
             end do calcula_fu
-            !$omp end target teams distribute parallel do
+            !$omp end parallel do
+            !$omp end target
             !
             error = dsqrt(error)
+            print*, "DEBUG:", error
             !
             !--------------------------
             !--------------------------
@@ -964,7 +967,8 @@ DO l=1,itermax/paq_itera      !inicio del repetidor principal
             !
             erro1 = 0.0_DBL
             !
-            !$omp target teams distribute parallel do reduction(+:erro1)
+            !$omp target map(tofrom:erro1)
+            !$omp parallel do reduction(+:erro1)
             calcula_fv: do kk = 2, lk
                do jj = 2, nj-1
                   do ii = 2, mi
@@ -973,7 +977,8 @@ DO l=1,itermax/paq_itera      !inicio del repetidor principal
                   end do
                end do
             end do calcula_fv
-            !$omp end target teams distribute parallel do
+            !$omp end parallel do
+            !$omp end target
             !
             erro1=dsqrt(erro1)+error
             !
@@ -1341,8 +1346,8 @@ DO l=1,itermax/paq_itera      !inicio del repetidor principal
          !
          correccion_presion: do tt = 1, ecuamax
             !
-            !$omp target teams distribute parallel do collapse(3) &
-            !$omp map(from: fcorr_pres) map(to:corr_pres)
+            !$omp target teams distribute parallel do collapse(3)
+            ! $omp map(from: fcorr_pres) map(to:corr_pres)
             inicializa_fcorr_press: do kk=1, lk+1
                do jj=1, nj+1
                   do ii = 1, mi+1
@@ -2055,7 +2060,8 @@ DO l=1,itermax/paq_itera      !inicio del repetidor principal
          !
          maxbo   = 0.0_DBL
          !
-         !$omp target teams distribute parallel do reduction(+:maxbo)
+         !$omp target map(tofrom:maxbo)
+         !$omp parallel do reduction(+:maxbo)
          calculo_maxbo: do ii = 2, mi
             do jj = 2, nj
                do kk = 2, lk
@@ -2063,9 +2069,11 @@ DO l=1,itermax/paq_itera      !inicio del repetidor principal
                end do
             end do
          end do calculo_maxbo
-         !$omp end target teams distribute parallel do
+         !$omp end parallel do
+         !$omp end target
          !
          maxbo =dsqrt(maxbo)
+         print*, "DEBUG: ",maxbo
          !
          residuo = 0.0_DBL
          !
