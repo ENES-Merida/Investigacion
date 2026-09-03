@@ -642,7 +642,6 @@ DO l=1,itermax/paq_itera      !inicio del repetidor principal
             !$omp end target
             !
             error = dsqrt(error)
-            print*, "DEBUG:", error
             !
             !--------------------------
             !--------------------------
@@ -2073,7 +2072,6 @@ DO l=1,itermax/paq_itera      !inicio del repetidor principal
          !$omp end target
          !
          maxbo =dsqrt(maxbo)
-         print*, "DEBUG: ",maxbo
          !
          residuo = 0.0_DBL
          !
